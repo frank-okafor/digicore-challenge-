@@ -60,7 +60,7 @@ public class UserAccountService {
 		if (accountRequest.getInitialDeposit() == null
 				|| accountRequest.getInitialDeposit().compareTo(new BigDecimal("500.00")) < 0) {
 			throw new ServiceException(Integer.valueOf(BAD_REQUEST.getCanonicalCode()),
-					"Minimum deposit amount is #500", LocalDateTime.now().toString());
+					"Minimum initial deposit amount is #500", LocalDateTime.now().toString());
 		}
 
 		UserAccount account = UserAccount.builder().accountName(accountRequest.getAccountName())
@@ -70,7 +70,6 @@ public class UserAccountService {
 				.totalBalance(accountRequest.getInitialDeposit()).build();
 
 		try {
-
 			response = new ServiceResponse(OK.getCanonicalCode(), OK.getDescription(), LocalDateTime.now().toString(),
 					accountRepository.save(account));
 		} catch (Exception e) {
@@ -102,10 +101,14 @@ public class UserAccountService {
 
 	public ServiceResponse withdraw(TransactionRequestDTO request) {
 		return accountRepository.findByAccountNumber(request.getAccountNumber()).map(user -> {
-			if (request.getAmount() == null || request.getAmount().compareTo(new BigDecimal("1.00")) <= 0
-					|| user.getTotalBalance().subtract(request.getAmount()).compareTo(new BigDecimal("500.00")) < 0) {
+			if (request.getAmount() == null || request.getAmount().compareTo(new BigDecimal("1.00")) < 0) {
 				throw new ServiceException(Integer.valueOf(BAD_REQUEST.getCanonicalCode()),
-						"You cannot withdraw less than #1.00 and you must have a minimum balance amount of #500",
+						"Mininum allowed withdrawal #1.00", LocalDateTime.now().toString());
+			}
+
+			if (user.getTotalBalance().subtract(request.getAmount()).compareTo(new BigDecimal("500.00")) < 0) {
+				throw new ServiceException(Integer.valueOf(BAD_REQUEST.getCanonicalCode()),
+						"You cannot withdraw the specified amount as minimum account balance is #500",
 						LocalDateTime.now().toString());
 			}
 
@@ -123,10 +126,14 @@ public class UserAccountService {
 
 	public ServiceResponse deposit(TransactionRequestDTO request) {
 		return accountRepository.findByAccountNumber(request.getAccountNumber()).map(user -> {
-			if (request.getAmount() == null || request.getAmount().compareTo(new BigDecimal("1000000")) > 0
-					|| request.getAmount().compareTo(new BigDecimal("1.00")) <= 0) {
+			if (request.getAmount().compareTo(new BigDecimal("1.00")) <= 0) {
 				throw new ServiceException(Integer.valueOf(BAD_REQUEST.getCanonicalCode()),
-						"You cannot deposit less than #1.00 or more than #1,000,000", LocalDateTime.now().toString());
+						"Minimum deposit amount is #1.00", LocalDateTime.now().toString());
+			}
+
+			if (request.getAmount() == null || request.getAmount().compareTo(new BigDecimal("1000000")) > 0) {
+				throw new ServiceException(Integer.valueOf(BAD_REQUEST.getCanonicalCode()),
+						"Maximum deposit amount is #1,000,000", LocalDateTime.now().toString());
 			}
 
 			user.setTotalBalance(user.getTotalBalance().add(request.getAmount()));

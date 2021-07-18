@@ -1,11 +1,9 @@
 package com.digicore.challenge.exception;
 
-import static com.digicore.challenge.enums.ResponseCode.BAD_REQUEST;
 import static com.digicore.challenge.enums.ResponseCode.INTERNAL_SERVER_ERROR;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -38,14 +36,6 @@ public class AdviceControllerThrowable {
 	public ServiceResponse noAccessException(AuthenticationException e) {
 		log.error("AuthenticationException ", e);
 		return new ServiceResponse("401", e.getMessage() + ", you do not privilege to access this resource");
-	}
-
-	@ExceptionHandler(MethodArgumentNotValidException.class)
-	@ResponseStatus(value = HttpStatus.BAD_REQUEST)
-	public ServiceResponse noAccessException(MethodArgumentNotValidException e) {
-		log.error("MethodArgumentNotValidException ", e);
-		return new ServiceResponse(BAD_REQUEST.getCanonicalCode(),
-				"Wrong message was sent or some required fields were not provided");
 	}
 
 	@ExceptionHandler(Exception.class)
