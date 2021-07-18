@@ -22,6 +22,6 @@ Swagger api documentation was used for this service
 
 Use the below url to access the swagger ui on Heroku for your testing pleasure.
 
-https://video-rental-challenge.herokuapp.com/swagger-ui.html#/
+https://digicore-challenge.herokuapp.com/swagger-ui.html#/service-controller
 
 Please reach out to me for any questions or clarification (Frank Okafor).
